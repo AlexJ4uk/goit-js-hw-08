@@ -68,6 +68,8 @@ const container = document.querySelector('.gallery');
 
 container.insertAdjacentHTML("beforeend", createMarkup(images));
 
+container.addEventListener('click', handleClick);
+
 function createMarkup(arr) {
     return arr.map(item => `
     <li class="gallery-item">
@@ -82,3 +84,30 @@ function createMarkup(arr) {
         `).join('');
 }
 
+function handleClick(event) {
+    event.preventDefault();
+    if (event.target.nodeName !== "IMG") {
+        return;
+    }
+    const selectedImage = event.target.dataset.source;
+    const description = event.target.alt;
+
+    const instance = basicLightbox.create(`
+    <img src="${selectedImage}" alt="${description}" />
+`, {
+        onShow: () => {
+            window.addEventListener('keydown', onEsc)
+        },
+        onClose: () => {
+            window.removeEventListener('keydown', onEsc)
+        }
+    });
+
+    function onEsc(event) {
+        if (event.key === "Escape") {
+            instance.close();
+        }
+    }
+
+instance.show()
+}
